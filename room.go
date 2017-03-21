@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/http/httputil"
 
 	"github.com/gorilla/websocket"
 )
@@ -56,20 +55,21 @@ func (r *room) run() {
 }
 
 func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	requestDump, err := httputil.DumpRequest(req, true)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(requestDump))
 	socket, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Fatal("ServeHTTP: ", err)
 		return
 	}
+	// authCookie, err := req.Cookie("auth")
+	if err != nil {
+		log.Fatal("Failed to get auth cookie: ", err)
+		return
+	}
 	client := &client{
-		socket: socket,
-		send:   make(chan *message, messageBufferSize),
-		room:   r,
+		socket:   socket,
+		send:     make(chan *message, messageBufferSize),
+		room:     r,
+		userData: make(map[string]interface{}),
 	}
 	r.join <- client
 	defer func() { r.leave <- client }()

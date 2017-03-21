@@ -7,9 +7,10 @@ import (
 )
 
 type client struct {
-	socket *websocket.Conn
-	send   chan *message
-	room   *room
+	socket   *websocket.Conn
+	send     chan *message
+	room     *room
+	userData map[string]interface{}
 }
 
 func (c *client) read() {
@@ -21,7 +22,8 @@ func (c *client) read() {
 			return
 		}
 		msg.When = time.Now()
-		msg.Name = c.userData["name"].(string)
+		// msg.Name = c.userData["name"].(string)
+		msg.Name = "Test"
 		c.room.forward <- msg
 	}
 }
