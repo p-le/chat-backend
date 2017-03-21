@@ -13,7 +13,7 @@ type client struct {
 func (c *client) read() {
 	defer c.socket.Close()
 	for {
-		_, msg, err := c.socket.ReadMessage()go 
+		_, msg, err := c.socket.ReadMessage()
 		if err != nil {
 			return
 		}
