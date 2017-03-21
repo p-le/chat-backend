@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -72,8 +71,16 @@ func loginHandler(writer http.ResponseWriter, req *http.Request) {
 				return
 			}
 			defer response.Body.Close()
-			contents, err := ioutil.ReadAll(response.Body)
-			fmt.Fprintf(writer, "Content: %s\n", contents)
+			// contents, err := ioutil.ReadAll(response.Body)
+			http.SetCookie(writer, &http.Cookie{
+				Name:  "auth",
+				Value: "Test",
+				Path:  "/",
+			})
+			// TODO parse contents get name
+			writer.Header().Set("Location", "/chat")
+			writer.WriteHeader(http.StatusTemporaryRedirect)
+			return
 		}
 	default:
 		writer.WriteHeader(http.StatusNotFound)
